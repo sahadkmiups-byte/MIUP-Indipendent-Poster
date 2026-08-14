@@ -2,7 +2,7 @@
 <html lang="ml">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MIUPS Kuttiady</title>
+<title>MIUPS Kuttiady Centennium</title>
 <style>
 body{font-family:Arial;background:#eef2f7;text-align:center;padding:12px;margin:0;}
 .box{background:#fff;max-width:430px;margin:auto;padding:16px;border-radius:16px;box-shadow:0 5px 20px rgba(0,0,0,.15);}
@@ -14,18 +14,19 @@ canvas{width:100%;margin-top:12px;border-radius:12px;border:1px solid #ddd;}
 </head>
 <body>
 <div class="box">
-<h3 style="color:#0d47a1;">MIUPS KUTTIADY</h3>
+<h3 style="color:#0d47a1;">MIUPS KUTTIADY - 100 YEARS</h3>
 <input type="file" id="photo" accept="image/*">
 <input type="text" id="name" placeholder="Name">
-<input type="text" id="classDiv" placeholder="Class">
+<input type="text" id="classDiv" placeholder="Class & Div">
 <button id="btn1" onclick="draw()">Preview</button>
 <button id="btn2" onclick="downloadImg()">Download</button>
-<canvas id="c" width="1080" height="1350"></canvas>
+<canvas id="c" width="1080" height="1800"></canvas>
 </div>
 <script>
 const canvas=document.getElementById('c'), ctx=canvas.getContext('2d');
 const bg=new Image(); bg.src='bg.jpg'; let userImg=null;
 bg.onload=()=>draw();
+
 document.getElementById('photo').addEventListener('change', e=>{
   const f=e.target.files[0]; if(!f) return;
   userImg=new Image(); userImg.onload=()=>draw(); userImg.src=URL.createObjectURL(f);
@@ -34,16 +35,15 @@ document.getElementById('name').addEventListener('input', draw);
 document.getElementById('classDiv').addEventListener('input', draw);
 
 function draw(){
-  ctx.drawImage(bg,0,0,1080,1350);
+  ctx.drawImage(bg,0,0,1080,1800);
 
-  // === OPTION 2 - CORRECT WHITE BACKGROUND POSITION ===
-  // Photo താഴ്ത്തി, White-ൽ Fix ചെയ്തു
-  const px=705, py=480, pw=235, ph=285;
+  // === CORRECT WHITE BACKGROUND POSITION FOR THIS TEMPLATE ===
+  const px=698, py=590, pw=360, ph=485;
 
   if(userImg){
     ctx.save();
     ctx.beginPath();
-    const r=12;
+    const r=8;
     ctx.moveTo(px+r,py); ctx.lineTo(px+pw-r,py); ctx.quadraticCurveTo(px+pw,py,px+pw,py+r);
     ctx.lineTo(px+pw,py+ph-r); ctx.quadraticCurveTo(px+pw,py+ph,px+pw-r,py+ph);
     ctx.lineTo(px+r,py+ph); ctx.quadraticCurveTo(px,py+ph,px,py+ph-r);
@@ -54,39 +54,23 @@ function draw(){
     let w=userImg.width*s, h=userImg.height*s;
     ctx.drawImage(userImg, px+(pw-w)/2, py+(ph-h)/2, w, h);
     ctx.restore();
-
-    // White Border
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(px+r,py); ctx.lineTo(px+pw-r,py); ctx.quadraticCurveTo(px+pw,py,px+pw,py+r);
-    ctx.lineTo(px+pw,py+ph-r); ctx.quadraticCurveTo(px+pw,py+ph,px+pw-r,py+ph);
-    ctx.lineTo(px+r,py+ph); ctx.quadraticCurveTo(px,py+ph,px,py+ph-r);
-    ctx.lineTo(px,py+r); ctx.quadraticCurveTo(px,py,px+r,py);
-    ctx.closePath();
-    ctx.strokeStyle="#fff"; ctx.lineWidth=6; ctx.stroke();
-    ctx.restore();
   }
 
-  // Text - Photo-യുടെ തൊട്ട് താഴെ White-ൽ
-  const nameVal=document.getElementById('name').value;
-  const classVal=document.getElementById('classDiv').value;
-
-  // Text-ന് പിന്നിൽ ചെറിയ വെള്ള ഷേഡ് - പതാകയിൽ നിന്ന് മാറി നിൽക്കാൻ
-  if(nameVal || classVal){
-    ctx.fillStyle="rgba(255,255,255,0.9)";
-    ctx.fillRect(px-10, py+ph+5, pw+20, 60);
-  }
-
+  // Text Position - ഈ Template-ന് അനുസരിച്ച് താഴ്ത്തി
+  const cx = px + pw/2;
   ctx.textAlign="center";
-  ctx.fillStyle="#000"; ctx.font="bold 26px Arial";
-  ctx.fillText(nameVal, px+pw/2, py+ph+32);
-  ctx.fillStyle="#444"; ctx.font="20px Arial";
-  ctx.fillText(classVal, px+pw/2, py+ph+56);
+  ctx.fillStyle="#000000";
+  ctx.font="bold 38px Arial";
+  ctx.fillText(document.getElementById('name').value, cx, py+ph+50);
+
+  ctx.fillStyle="#000000";
+  ctx.font="600 30px Arial";
+  ctx.fillText(document.getElementById('classDiv').value, cx, py+ph+88);
 }
 
 function downloadImg(){
   const a=document.createElement('a');
-  a.download=(document.getElementById('name').value || 'MIUPS')+'_Poster.png';
+  a.download=(document.getElementById('name').value || 'MIUPS')+'_Independence.png';
   a.href=canvas.toDataURL('image/png'); a.click();
 }
 </script>
