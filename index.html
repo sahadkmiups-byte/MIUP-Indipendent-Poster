@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIUPS KUTTIADY - Independence Poster</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
+<style>
+body{font-family: Arial; background:#eef2f7; text-align:center; padding:15px; margin:0;}
+.box{background:#fff; max-width:420px; margin:auto; padding:20px; border-radius:15px; box-shadow:0 5px 20px rgba(0,0,0,.15);}
+input{width:95%; padding:12px; margin:8px 0; border-radius:8px; border:1px solid #ccc; font-size:16px;}
+button{width:95%; padding:13px; border:none; border-radius:8px; font-weight:bold; font-size:16px; margin-top:10px; cursor:pointer;}
+#btn1{background:#0d47a1; color:#fff;} #btn2{background:#138808; color:#fff;}
+canvas{width:100%; margin-top:15px; border-radius:12px; background:#fff;}
+/* Crop Modal */
+#cropModal{display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999; padding:20px; box-sizing:border-box;}
+#cropBox{max-width:400px; margin:auto; background:#fff; padding:15px; border-radius:12px;}
+#cropImage{max-width:100%; display:block;}
+.crop-btns{display:flex; gap:10px; margin-top:10px;}
+.crop-btns button{width:50%;}
+</style>
+</head>
+<body>
+<div class="box">
+<h3 style="color:#0d47a1; margin:5px;">MIUPS KUTTIADY</h3>
+<p style="margin:5px 0 15px;">സ്വാതന്ത്ര്യദിന പോസ്റ്റർ മേക്കർ</p>
+<input type="file" id="photo" accept="image/*">
+<input type="text" id="name" placeholder="Name - പേര്">
+<input type="text" id="classDiv" placeholder="Class - ഉദാ: 5 A">
+<button id="btn1" onclick="draw()">പോസ്റ്റർ തയ്യാറാക്കുക</button>
+<button id="btn2" onclick="download()">Download ചെയ്യുക</button>
+<canvas id="c" width="1080" height="1920"></canvas>
+</div>
+<div id="cropModal">
+  <div id="cropBox">
+    <h4>Crop Photo - ഫോട്ടോ ക്രോപ്പ് ചെയ്യുക</h4>
+    <img id="cropImage">
+    <div class="crop-btns">
+      <button onclick="closeCrop()" style="background:#ccc;">Cancel</button>
+      <button onclick="applyCrop()" style="background:#0d47a1; color:#fff;">Crop & Use</button>
+    </div>
+    <p style="font-size:12px; color:#666;">Zoom ചെയ്യാനും നീക്കാനും രണ്ടു വിരൽ ഉപയോഗിക്കാം</p>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const bg = new Image();
+bg.src = 'bg.jpg';
+let userImg = null;
+let cropper = null;
+bg.onload = ()=> draw();
+document.getElementById('photo').addEventListener('change', e=>{
+  const file = e.target.files[0]; if(!file) return;
+  const url = URL.createObjectURL(file);
+  document.getElementById('cropImage').src = url;
+  document.getElementById('cropModal').style.display='block';
+  setTimeout(()=>{
+    if(cropper) cropper.destroy();
+    cropper = new Cropper(document.getElementById('cropImage'), {
+      aspectRatio: 285/355, // നിങ്ങളുടെ poster-ലെ കള്ളിയുടെ ratio
+      viewMode:1,
+      autoCropArea:0.9,
+      movable:true, zoomable:true
+    });
+  },200);
+});
+function closeCrop(){ document.getElementById('cropModal').style.display='none'; if(cropper) cropper.destroy(); }
+function applyCrop(){
+  if(!cropper) return;
+  const croppedCanvas = cropper.getCroppedCanvas({width:600, height:750, imageSmoothingQuality:'high'});
+  userImg = new Image();
+  userImg.onload = ()=> { closeCrop(); draw(); };
+  userImg.src = croppedCanvas.toDataURL('image/png');
+}
+document.getElementById('name').addEventListener('input', draw);
+document.getElementById('classDiv').addEventListener('input', draw);
+function draw(){
+  ctx.clearRect(0,0,1080,1920);
+  ctx.drawImage(bg, 0, 0, 1080, 1920);
+  const px=545, py=680, pw=285, ph=355;
+  if(userImg){
+    ctx.save();
+    ctx.beginPath(); ctx.rect(px, py, pw, ph); ctx.clip();
+    let scale = Math.max(pw/userImg.width, ph/userImg.height);
+    let w=userImg.width*scale, h=userImg.height*scale;
+    ctx.drawImage(userImg, px+(pw-w)/2, py+(ph-h)/2, w, h);
+    ctx.restore();
+  }
+  const nameVal = document.getElementById('name').value;
+  const classVal = document.getElementById('classDiv').value;
+  ctx.textAlign="left";
+  ctx.fillStyle="#000";
+  ctx.font="bold 34px 'Noto Sans Malayalam', Arial";
+  ctx.fillText(nameVal, 865, 800);
+  ctx.font="26px Arial"; ctx.fillStyle="#333";
+  ctx.fillText(classVal, 865, 840);
+}
+function download(){
+  const a=document.createElement('a');
+  a.download='MIUPS_Kuttiady_Poster.png';
+  a.href=canvas.toDataURL('image/png');
+  a.click();
+}
+</script>
+</body>
+</html>
