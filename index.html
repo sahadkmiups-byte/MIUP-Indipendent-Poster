@@ -27,7 +27,6 @@ const canvas=document.getElementById('c'), ctx=canvas.getContext('2d');
 const bg=new Image(); bg.src='bg.jpg'; let userImg=null;
 
 bg.onload=()=>{
-  // Original Size തന്നെ Canvas-ന് കൊടുക്കുക - വലിവ് ഇല്ല
   canvas.width=bg.naturalWidth;
   canvas.height=bg.naturalHeight;
   draw();
@@ -42,19 +41,17 @@ document.getElementById('classDiv').addEventListener('input', draw);
 
 function draw(){
   if(!bg.complete) return;
-  // Canvas Size = Background Size, അതുകൊണ്ട് Stretch ഇല്ല
   ctx.clearRect(0,0,canvas.width,canvas.height);
   ctx.drawImage(bg,0,0,canvas.width,canvas.height);
 
-  // Photo Position - White Background-ൽ - Ratio അനുസരിച്ച്
-  // bg 1080px ആണെങ്കിൽ ഈ Position Correct ആണ്. വലിയ bg ആണെങ്കിൽ auto adjust ആകും
+  // === PERFECT POSITION - മുകളിലേക്ക് കയറ്റി ===
   const scale = canvas.width / 1080;
-  const px=650*scale, py=700*scale, pw=360*scale, ph=460*scale;
+  const px=620*scale, py=545*scale, pw=400*scale, ph=520*scale;
 
   if(userImg){
     ctx.save();
     ctx.beginPath();
-    const r=14*scale;
+    const r=16*scale;
     ctx.moveTo(px+r,py); ctx.lineTo(px+pw-r,py); ctx.quadraticCurveTo(px+pw,py,px+pw,py+r);
     ctx.lineTo(px+pw,py+ph-r); ctx.quadraticCurveTo(px+pw,py+ph,px+pw-r,py+ph);
     ctx.lineTo(px+r,py+ph); ctx.quadraticCurveTo(px,py+ph,px,py+ph-r);
@@ -65,15 +62,28 @@ function draw(){
     let w=userImg.width*s, h=userImg.height*s;
     ctx.drawImage(userImg, px+(pw-w)/2, py+(ph-h)/2, w, h);
     ctx.restore();
+
+    // White border
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(px+r,py); ctx.lineTo(px+pw-r,py); ctx.quadraticCurveTo(px+pw,py,px+pw,py+r);
+    ctx.lineTo(px+pw,py+ph-r); ctx.quadraticCurveTo(px+pw,py+ph,px+pw-r,py+ph);
+    ctx.lineTo(px+r,py+ph); ctx.quadraticCurveTo(px,py+ph,px,py+ph-r);
+    ctx.lineTo(px,py+r); ctx.quadraticCurveTo(px,py,px+r,py);
+    ctx.closePath();
+    ctx.strokeStyle="#ffffff"; ctx.lineWidth=6*scale; ctx.stroke();
+    ctx.restore();
   }
 
   const cx=px+pw/2;
   ctx.textAlign="center";
   ctx.fillStyle="#000";
-  ctx.font=`bold ${38*scale}px Arial`;
-  ctx.fillText(document.getElementById('name').value, cx, py+ph+55*scale);
-  ctx.font=`600 ${30*scale}px Arial`;
-  ctx.fillText(document.getElementById('classDiv').value, cx, py+ph+95*scale);
+  ctx.shadowColor="rgba(255,255,255,0.9)"; ctx.shadowBlur=8*scale;
+  ctx.font=`bold ${42*scale}px Arial`;
+  ctx.fillText(document.getElementById('name').value, cx, py+ph+50*scale);
+  ctx.font=`600 ${32*scale}px Arial`;
+  ctx.fillText(document.getElementById('classDiv').value, cx, py+ph+92*scale);
+  ctx.shadowBlur=0;
 }
 
 function downloadImg(){
