@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIUPS KUTTIADY - Independence Poster</title>
+<style>
+body{font-family:Arial;background:#eef2f7;text-align:center;padding:12px;margin:0;}
+.box{background:#fff;max-width:420px;margin:auto;padding:18px;border-radius:16px;box-shadow:0 5px 20px rgba(0,0,0,.15);}
+input{width:95%;padding:12px;margin:8px 0;border-radius:8px;border:1px solid #ccc;font-size:16px;box-sizing:border-box;}
+button{width:95%;padding:13px;border:none;border-radius:10px;font-weight:bold;font-size:16px;margin-top:10px;cursor:pointer;}
+#btn1{background:#0d47a1;color:#fff;}
+#btn2{background:#138808;color:#fff;}
+canvas{width:100%;margin-top:15px;border-radius:12px;background:#fff;}
+</style>
+</head>
+<body>
+<div class="box">
+<h3 style="color:#0d47a1;margin:5px;">MIUPS KUTTIADY</h3>
+<p style="margin:5px 0 12px;">സ്വാതന്ത്ര്യ ദിന പോസ്റ്റർ</p>
+<input type="file" id="photo" accept="image/*">
+<input type="text" id="name" placeholder="Name - പേര് എഴുതുക">
+<input type="text" id="classDiv" placeholder="Class / Designation">
+<button id="btn1" onclick="draw()">Preview കാണുക</button>
+<button id="btn2" onclick="downloadImg()">Download ചെയ്യുക</button>
+<canvas id="c" width="1080" height="1350"></canvas>
+</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const bg = new Image();
+bg.src = 'bg.jpg'; // ഇതേ ഫോൾഡറിൽ bg.jpg ഉണ്ടായിരിക്കണം
+let userImg = null;
+
+bg.onload = () => draw();
+
+// Photo upload ചെയ്താൽ നേരെ വരും
+document.getElementById('photo').addEventListener('change', e=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  userImg = new Image();
+  userImg.onload = () => draw();
+  userImg.src = URL.createObjectURL(file);
+});
+
+document.getElementById('name').addEventListener('input', draw);
+document.getElementById('classDiv').addEventListener('input', draw);
+
+function draw(){
+  // Background
+  ctx.drawImage(bg, 0, 0, 1080, 1350);
+
+  // Photo - വലതു വശത്തെ ഒഴിഞ്ഞ സ്ഥലത്ത്
+  const px = 565, py = 485, pw = 275, ph = 325;
+  if(userImg){
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(px, py, pw, ph);
+    ctx.clip();
+    // Cover fit
+    let scale = Math.max(pw/userImg.width, ph/userImg.height);
+    let w = userImg.width * scale;
+    let h = userImg.height * scale;
+    ctx.drawImage(userImg, px + (pw-w)/2, py + (ph-h)/2, w, h);
+    ctx.restore();
+  }
+
+  // Name & Class
+  const nameVal = document.getElementById('name').value;
+  const classVal = document.getElementById('classDiv').value;
+  ctx.textAlign = "left";
+  ctx.fillStyle = "#000";
+  ctx.font = "bold 30px Arial";
+  if(nameVal) ctx.fillText(nameVal, 865, 585);
+  ctx.font = "22px Arial";
+  ctx.fillStyle = "#333";
+  if(classVal) ctx.fillText(classVal, 865, 615);
+}
+
+function downloadImg(){
+  const a = document.createElement('a');
+  a.download = (document.getElementById('name').value || 'MIUPS') + '_Poster.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+}
+</script>
+</body>
+</html>
