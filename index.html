@@ -2,21 +2,21 @@
 <html lang="ml">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MIUPS Independence Poster</title>
+<title>MIUPS Independence</title>
 <style>
 body{font-family:Arial;background:#eef2f7;text-align:center;padding:12px;margin:0;}
-.box{background:#fff;max-width:430px;margin:auto;padding:18px;border-radius:16px;box-shadow:0 5px 20px rgba(0,0,0,.15);}
-input{width:95%;padding:12px;margin:7px 0;border-radius:8px;border:1px solid #ccc;}
-button{width:95%;padding:13px;border:none;border-radius:10px;font-weight:bold;margin-top:10px;cursor:pointer;}
+.box{background:#fff;max-width:430px;margin:auto;padding:16px;border-radius:16px;box-shadow:0 5px 20px rgba(0,0,0,.15);}
+input{width:95%;padding:12px;margin:6px 0;border-radius:8px;border:1px solid #ccc;}
+button{width:95%;padding:13px;border:none;border-radius:10px;font-weight:bold;margin-top:8px;}
 #btn1{background:#0d47a1;color:#fff;} #btn2{background:#138808;color:#fff;}
-canvas{width:100%;margin-top:15px;border-radius:12px;background:#fff;}
+canvas{width:100%;margin-top:12px;border-radius:12px;}
 </style>
 </head>
 <body>
 <div class="box">
-<h3 style="color:#0d47a1;">MIUPS KUTTIADY</h3>
+<h3 style="color:#0d47a1;margin:4px;">MIUPS KUTTIADY</h3>
 <input type="file" id="photo" accept="image/*">
-<input type="text" id="name" placeholder="Name - ഉദാ: Sahad K">
+<input type="text" id="name" placeholder="Name">
 <input type="text" id="classDiv" placeholder="Class / Designation">
 <button id="btn1" onclick="draw()">Preview</button>
 <button id="btn2" onclick="downloadImg()">Download</button>
@@ -32,36 +32,39 @@ document.getElementById('photo').addEventListener('change', e=>{
 });
 document.getElementById('name').addEventListener('input', draw);
 document.getElementById('classDiv').addEventListener('input', draw);
+
 function draw(){
   ctx.drawImage(bg,0,0,1080,1350);
-  // FIXED POSITION - ഇതാണ് കറക്റ്റ് സ്ഥലം
-  const px=685, py=375, pw=255, ph=315;
+  // === SIZE കുറച്ചത് ഇവിടെയാണ് ===
+  const px=695, py=380, pw=230, ph=285; // pw, ph കുറച്ചു
   if(userImg){
     ctx.save();
     ctx.beginPath();
-    // Rounded corner
-    const r=12; ctx.moveTo(px+r,py); ctx.arcTo(px+pw,py,px+pw,py+ph,r); ctx.arcTo(px+pw,py+ph,px,py+ph,r); ctx.arcTo(px,py+ph,px,py,r); ctx.arcTo(px,py,px+pw,py,r); ctx.closePath();
+    const r=10;
+    ctx.moveTo(px+r,py); ctx.lineTo(px+pw-r,py); ctx.quadraticCurveTo(px+pw,py,px+pw,py+r);
+    ctx.lineTo(px+pw,py+ph-r); ctx.quadraticCurveTo(px+pw,py+ph,px+pw-r,py+ph);
+    ctx.lineTo(px+r,py+ph); ctx.quadraticCurveTo(px,py+ph,px,py+ph-r);
+    ctx.lineTo(px,py+r); ctx.quadraticCurveTo(px,py,px+r,py);
+    ctx.closePath();
     ctx.clip();
-    // Cover fit
     let s=Math.max(pw/userImg.width, ph/userImg.height);
     let w=userImg.width*s, h=userImg.height*s;
     ctx.drawImage(userImg, px+(pw-w)/2, py+(ph-h)/2, w, h);
     ctx.restore();
+    // നേർത്ത വെള്ള ബോർഡർ - കൂടുതൽ ഭംഗിക്ക്
+    ctx.strokeStyle="#ffffff"; ctx.lineWidth=4;
+    ctx.stroke();
   }
-  // Name - ഫോട്ടോയുടെ താഴെ
-  ctx.textAlign="center";
-  ctx.fillStyle="#000";
-  ctx.font="bold 28px Arial";
-  ctx.fillText(document.getElementById('name').value, px+pw/2, py+ph+35);
-  ctx.font="20px Arial";
-  ctx.fillStyle="#333";
-  ctx.fillText(document.getElementById('classDiv').value, px+pw/2, py+ph+60);
+  ctx.textAlign="center"; ctx.fillStyle="#000";
+  ctx.font="bold 26px Arial";
+  ctx.fillText(document.getElementById('name').value, px+pw/2, py+ph+32);
+  ctx.font="18px Arial"; ctx.fillStyle="#333";
+  ctx.fillText(document.getElementById('classDiv').value, px+pw/2, py+ph+54);
 }
 function downloadImg(){
   const a=document.createElement('a');
   a.download=(document.getElementById('name').value || 'MIUPS')+'_Poster.png';
-  a.href=canvas.toDataURL('image/png');
-  a.click();
+  a.href=canvas.toDataURL('image/png'); a.click();
 }
 </script>
 </body>
