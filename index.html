@@ -1,114 +1,90 @@
 <!DOCTYPE html>
 <html lang="ml">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MIUPS Kuttiady - Independence Day</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIUPS Independence</title>
 <style>
-body{font-family:Arial,sans-serif;background:#eef2f7;text-align:center;padding:12px;margin:0;}
+body{font-family:Arial;background:#eef2f7;text-align:center;padding:12px;margin:0;}
 .box{background:#fff;max-width:430px;margin:auto;padding:16px;border-radius:16px;box-shadow:0 5px 20px rgba(0,0,0,.15);}
-h3{color:#0d47a1;margin:5px 0 10px 0;}
-input{width:95%;padding:12px;margin:6px 0;border-radius:8px;border:1px solid #ccc;font-size:15px;box-sizing:border-box;}
-button{width:95%;padding:13px;border:none;border-radius:10px;font-weight:bold;margin-top:8px;cursor:pointer;font-size:15px;}
-#btn1{background:#0d47a1;color:#fff;}
-#btn2{background:#138808;color:#fff;}
-canvas{width:100%;margin-top:12px;border-radius:12px;background:#fff;}
+input{width:95%;padding:12px;margin:6px 0;border-radius:8px;border:1px solid #ccc;}
+button{width:95%;padding:13px;border:none;border-radius:10px;font-weight:bold;margin-top:8px;}
+#btn1{background:#0d47a1;color:#fff;} #btn2{background:#138808;color:#fff;}
+canvas{width:100%;margin-top:12px;border-radius:12px;border:1px solid #ddd;}
 </style>
 </head>
 <body>
 <div class="box">
-<h3>MIUPS KUTTIADY</h3>
+<h3 style="color:#0d47a1;">MIUPS KUTTIADY</h3>
 <input type="file" id="photo" accept="image/*">
-<input type="text" id="name" placeholder="Name - ഉദാ: Sahad K">
-<input type="text" id="classDiv" placeholder="Class - ഉദാ: 5F">
-<button id="btn1" onclick="draw()">Preview കാണുക</button>
-<button id="btn2" onclick="downloadImg()">Download ചെയ്യുക</button>
+<input type="text" id="name" placeholder="Name">
+<input type="text" id="classDiv" placeholder="Class">
+<button id="btn1" onclick="draw()">Preview</button>
+<button id="btn2" onclick="downloadImg()">Download</button>
 <canvas id="c" width="1080" height="1350"></canvas>
+<p id="status" style="color:red;font-size:13px;"></p>
 </div>
-
 <script>
-const canvas=document.getElementById('c');
-const ctx=canvas.getContext('2d');
-const bg=new Image();
-bg.src='bg.jpg';
-let userImg=null;
+const canvas=document.getElementById('c'), ctx=canvas.getContext('2d');
+const bg=new Image(); bg.src='bg.jpg'; let userImg=null;
 
-bg.onload=()=>draw();
+bg.onload=()=>{ document.getElementById('status').innerText=''; draw(); };
+bg.onerror=()=>{ document.getElementById('status').innerText='Error: bg.jpg കണ്ടില്ല! GitHub-ൽ bg.jpg Upload ചെയ്തിട്ടുണ്ടോ എന്ന് നോക്കുക'; draw(); };
 
 document.getElementById('photo').addEventListener('change', e=>{
-  const f=e.target.files[0];
-  if(!f) return;
+  const f=e.target.files[0]; if(!f) return;
   userImg=new Image();
-  userImg.onload=()=>draw();
+  userImg.onload=()=>{ console.log('user photo loaded'); draw(); };
   userImg.src=URL.createObjectURL(f);
 });
-
 document.getElementById('name').addEventListener('input', draw);
 document.getElementById('classDiv').addEventListener('input', draw);
 
 function draw(){
-  // 1. Background
-  ctx.drawImage(bg,0,0,1080,1350);
+  ctx.clearRect(0,0,1080,1350);
+  // bg ഉണ്ടെങ്കിൽ വരയ്ക്കുക
+  if(bg.complete && bg.naturalWidth>0) ctx.drawImage(bg,0,0,1080,1350);
+  else { ctx.fillStyle='#fff'; ctx.fillRect(0,0,1080,1350); }
 
-  // 2. OPTION 2 - ഫോട്ടോ താഴ്ത്തി White Background-ൽ
+  // Option 2 Position - താഴ്ത്തിയത്
   const px=700, py=520, pw=240, ph=300;
 
   if(userImg){
     ctx.save();
-    // Rounded Rectangle Clip
     ctx.beginPath();
     const r=12;
-    ctx.moveTo(px+r,py);
-    ctx.lineTo(px+pw-r,py);
-    ctx.quadraticCurveTo(px+pw,py,px+pw,py+r);
-    ctx.lineTo(px+pw,py+ph-r);
-    ctx.quadraticCurveTo(px+pw,py+ph,px+pw-r,py+ph);
-    ctx.lineTo(px+r,py+ph);
-    ctx.quadraticCurveTo(px,py+ph,px,py+ph-r);
-    ctx.lineTo(px,py+r);
-    ctx.quadraticCurveTo(px,py,px+r,py);
+    ctx.moveTo(px+r,py); ctx.lineTo(px+pw-r,py); ctx.quadraticCurveTo(px+pw,py,px+pw,py+r);
+    ctx.lineTo(px+pw,py+ph-r); ctx.quadraticCurveTo(px+pw,py+ph,px+pw-r,py+ph);
+    ctx.lineTo(px+r,py+ph); ctx.quadraticCurveTo(px,py+ph,px,py+ph-r);
+    ctx.lineTo(px,py+r); ctx.quadraticCurveTo(px,py,px+r,py);
     ctx.closePath();
     ctx.clip();
-
-    // Cover Fit - ഫോട്ടോ Stretch ആവാതെ
     let s=Math.max(pw/userImg.width, ph/userImg.height);
-    let w=userImg.width*s;
-    let h=userImg.height*s;
+    let w=userImg.width*s, h=userImg.height*s;
     ctx.drawImage(userImg, px+(pw-w)/2, py+(ph-h)/2, w, h);
     ctx.restore();
 
-    // നേർത്ത വെള്ള ബോർഡർ
+    // Border - ശരിയായ രീതിയിൽ
     ctx.save();
-    ctx.strokeStyle="#ffffff";
-    ctx.lineWidth=5;
-    ctx.lineJoin="round";
-    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(px+r,py); ctx.lineTo(px+pw-r,py); ctx.quadraticCurveTo(px+pw,py,px+pw,py+r);
+    ctx.lineTo(px+pw,py+ph-r); ctx.quadraticCurveTo(px+pw,py+ph,px+pw-r,py+ph);
+    ctx.lineTo(px+r,py+ph); ctx.quadraticCurveTo(px,py+ph,px,py+ph-r);
+    ctx.lineTo(px,py+r); ctx.quadraticCurveTo(px,py,px+r,py);
+    ctx.closePath();
+    ctx.strokeStyle="#ffffff"; ctx.lineWidth=6; ctx.stroke();
     ctx.restore();
   }
 
-  // 3. Text - ഫോട്ടോയുടെ താഴെ
-  const nameVal=document.getElementById('name').value.trim();
-  const classVal=document.getElementById('classDiv').value.trim();
-
   ctx.textAlign="center";
-
-  // Name
-  ctx.fillStyle="#222222";
-  ctx.font="bold 26px Arial";
-  ctx.fillText(nameVal, px+pw/2, py+ph+32);
-
-  // Class
-  ctx.fillStyle="#555555";
-  ctx.font="20px Arial";
-  ctx.fillText(classVal, px+pw/2, py+ph+58);
+  ctx.fillStyle="#000"; ctx.font="bold 26px Arial";
+  ctx.fillText(document.getElementById('name').value, px+pw/2, py+ph+32);
+  ctx.fillStyle="#333"; ctx.font="20px Arial";
+  ctx.fillText(document.getElementById('classDiv').value, px+pw/2, py+ph+58);
 }
-
 function downloadImg(){
   const a=document.createElement('a');
-  const n=document.getElementById('name').value.trim() || 'MIUPS';
-  a.download=n+'_Independence_Poster.png';
-  a.href=canvas.toDataURL('image/png');
-  a.click();
+  a.download=(document.getElementById('name').value || 'MIUPS')+'_Poster.png';
+  a.href=canvas.toDataURL('image/png'); a.click();
 }
 </script>
 </body>
