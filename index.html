@@ -2,7 +2,7 @@
 <html lang="ml">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MIUPS Independence</title>
+<title>MIUPS Kuttiady</title>
 <style>
 body{font-family:Arial;background:#eef2f7;text-align:center;padding:12px;margin:0;}
 .box{background:#fff;max-width:430px;margin:auto;padding:16px;border-radius:16px;box-shadow:0 5px 20px rgba(0,0,0,.15);}
@@ -21,32 +21,24 @@ canvas{width:100%;margin-top:12px;border-radius:12px;border:1px solid #ddd;}
 <button id="btn1" onclick="draw()">Preview</button>
 <button id="btn2" onclick="downloadImg()">Download</button>
 <canvas id="c" width="1080" height="1350"></canvas>
-<p id="status" style="color:red;font-size:13px;"></p>
 </div>
 <script>
 const canvas=document.getElementById('c'), ctx=canvas.getContext('2d');
 const bg=new Image(); bg.src='bg.jpg'; let userImg=null;
-
-bg.onload=()=>{ document.getElementById('status').innerText=''; draw(); };
-bg.onerror=()=>{ document.getElementById('status').innerText='Error: bg.jpg കണ്ടില്ല! GitHub-ൽ bg.jpg Upload ചെയ്തിട്ടുണ്ടോ എന്ന് നോക്കുക'; draw(); };
-
+bg.onload=()=>draw();
 document.getElementById('photo').addEventListener('change', e=>{
   const f=e.target.files[0]; if(!f) return;
-  userImg=new Image();
-  userImg.onload=()=>{ console.log('user photo loaded'); draw(); };
-  userImg.src=URL.createObjectURL(f);
+  userImg=new Image(); userImg.onload=()=>draw(); userImg.src=URL.createObjectURL(f);
 });
 document.getElementById('name').addEventListener('input', draw);
 document.getElementById('classDiv').addEventListener('input', draw);
 
 function draw(){
-  ctx.clearRect(0,0,1080,1350);
-  // bg ഉണ്ടെങ്കിൽ വരയ്ക്കുക
-  if(bg.complete && bg.naturalWidth>0) ctx.drawImage(bg,0,0,1080,1350);
-  else { ctx.fillStyle='#fff'; ctx.fillRect(0,0,1080,1350); }
+  ctx.drawImage(bg,0,0,1080,1350);
 
-  // Option 2 Position - താഴ്ത്തിയത്
-  const px=700, py=520, pw=240, ph=300;
+  // === OPTION 2 - CORRECT WHITE BACKGROUND POSITION ===
+  // Photo താഴ്ത്തി, White-ൽ Fix ചെയ്തു
+  const px=705, py=480, pw=235, ph=285;
 
   if(userImg){
     ctx.save();
@@ -63,7 +55,7 @@ function draw(){
     ctx.drawImage(userImg, px+(pw-w)/2, py+(ph-h)/2, w, h);
     ctx.restore();
 
-    // Border - ശരിയായ രീതിയിൽ
+    // White Border
     ctx.save();
     ctx.beginPath();
     ctx.moveTo(px+r,py); ctx.lineTo(px+pw-r,py); ctx.quadraticCurveTo(px+pw,py,px+pw,py+r);
@@ -71,16 +63,27 @@ function draw(){
     ctx.lineTo(px+r,py+ph); ctx.quadraticCurveTo(px,py+ph,px,py+ph-r);
     ctx.lineTo(px,py+r); ctx.quadraticCurveTo(px,py,px+r,py);
     ctx.closePath();
-    ctx.strokeStyle="#ffffff"; ctx.lineWidth=6; ctx.stroke();
+    ctx.strokeStyle="#fff"; ctx.lineWidth=6; ctx.stroke();
     ctx.restore();
+  }
+
+  // Text - Photo-യുടെ തൊട്ട് താഴെ White-ൽ
+  const nameVal=document.getElementById('name').value;
+  const classVal=document.getElementById('classDiv').value;
+
+  // Text-ന് പിന്നിൽ ചെറിയ വെള്ള ഷേഡ് - പതാകയിൽ നിന്ന് മാറി നിൽക്കാൻ
+  if(nameVal || classVal){
+    ctx.fillStyle="rgba(255,255,255,0.9)";
+    ctx.fillRect(px-10, py+ph+5, pw+20, 60);
   }
 
   ctx.textAlign="center";
   ctx.fillStyle="#000"; ctx.font="bold 26px Arial";
-  ctx.fillText(document.getElementById('name').value, px+pw/2, py+ph+32);
-  ctx.fillStyle="#333"; ctx.font="20px Arial";
-  ctx.fillText(document.getElementById('classDiv').value, px+pw/2, py+ph+58);
+  ctx.fillText(nameVal, px+pw/2, py+ph+32);
+  ctx.fillStyle="#444"; ctx.font="20px Arial";
+  ctx.fillText(classVal, px+pw/2, py+ph+56);
 }
+
 function downloadImg(){
   const a=document.createElement('a');
   a.download=(document.getElementById('name').value || 'MIUPS')+'_Poster.png';
