@@ -6,10 +6,10 @@
 <style>
 body{font-family:Arial;background:#eef2f7;text-align:center;padding:12px;margin:0;}
 .box{background:#fff;max-width:430px;margin:auto;padding:16px;border-radius:16px;box-shadow:0 5px 20px rgba(0,0,0,.15);}
-input{width:95%;padding:12px;margin:6px 0;border-radius:8px;border:1px solid #ccc;}
-button{width:95%;padding:13px;border:none;border-radius:10px;font-weight:bold;margin-top:8px;cursor:pointer;}
+input{width:95%;padding:12px;margin:6px 0;border-radius:8px;border:1px solid #ccc;font-size:15px;}
+button{width:95%;padding:13px;border:none;border-radius:10px;font-weight:bold;margin-top:8px;cursor:pointer;font-size:16px;}
 #btn1{background:#0d47a1;color:#fff;} #btn2{background:#138808;color:#fff;}
-canvas{width:100%;height:auto;display:block;margin-top:12px;border-radius:12px;}
+canvas{width:100%;height:auto;display:block;margin-top:12px;border-radius:12px;background:#fff;}
 </style>
 </head>
 <body>
@@ -17,7 +17,7 @@ canvas{width:100%;height:auto;display:block;margin-top:12px;border-radius:12px;}
 <h3 style="color:#0d47a1;">MIUPS KUTTIADY - 100 YEARS</h3>
 <input type="file" id="photo" accept="image/*">
 <input type="text" id="name" placeholder="Name - ഉദാ: Sahad K">
-<input type="text" id="classDiv" placeholder="Class - ഉദാ: 5F">
+<input type="text" id="classDiv" placeholder="Place - ഉദാ: Narippatta">
 <button id="btn1" onclick="draw()">Preview കാണുക</button>
 <button id="btn2" onclick="downloadImg()">Download ചെയ്യുക</button>
 <canvas id="c"></canvas>
@@ -44,9 +44,9 @@ function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
   ctx.drawImage(bg,0,0,canvas.width,canvas.height);
 
-  // === PERFECT POSITION - മുകളിലേക്ക് കയറ്റി ===
+  // ===== FINAL POSITION - വലത്തോട്ട് ആക്കി, വലിവില്ലാതെ =====
   const scale = canvas.width / 1080;
-  const px=620*scale, py=545*scale, pw=400*scale, ph=520*scale;
+  const px=660*scale, py=505*scale, pw=390*scale, ph=520*scale;
 
   if(userImg){
     ctx.save();
@@ -63,7 +63,7 @@ function draw(){
     ctx.drawImage(userImg, px+(pw-w)/2, py+(ph-h)/2, w, h);
     ctx.restore();
 
-    // White border
+    // നേർത്ത വെള്ള ബോർഡർ
     ctx.save();
     ctx.beginPath();
     ctx.moveTo(px+r,py); ctx.lineTo(px+pw-r,py); ctx.quadraticCurveTo(px+pw,py,px+pw,py+r);
@@ -71,19 +71,32 @@ function draw(){
     ctx.lineTo(px+r,py+ph); ctx.quadraticCurveTo(px,py+ph,px,py+ph-r);
     ctx.lineTo(px,py+r); ctx.quadraticCurveTo(px,py,px+r,py);
     ctx.closePath();
-    ctx.strokeStyle="#ffffff"; ctx.lineWidth=6*scale; ctx.stroke();
+    ctx.strokeStyle="#ffffff"; ctx.lineWidth=5*scale; ctx.stroke();
     ctx.restore();
   }
 
+  // Name & Place - ഫോട്ടോയുടെ തൊട്ട് താഴെ, വെള്ള പലകയിൽ
   const cx=px+pw/2;
+  const nameY = py+ph+45*scale;
+  const placeY = py+ph+82*scale;
+  const textW = 340*scale;
+
+  // വെള്ള പലക - കെട്ടിടത്തിൽ നിന്ന് വ്യക്തമാകാൻ
+  if(document.getElementById('name').value || document.getElementById('classDiv').value){
+    ctx.fillStyle="rgba(255,255,255,0.93)";
+    ctx.beginPath();
+    ctx.roundRect(cx-textW/2, nameY-36*scale, textW, 85*scale, 12*scale);
+    ctx.fill();
+  }
+
   ctx.textAlign="center";
-  ctx.fillStyle="#000";
-  ctx.shadowColor="rgba(255,255,255,0.9)"; ctx.shadowBlur=8*scale;
-  ctx.font=`bold ${42*scale}px Arial`;
-  ctx.fillText(document.getElementById('name').value, cx, py+ph+50*scale);
-  ctx.font=`600 ${32*scale}px Arial`;
-  ctx.fillText(document.getElementById('classDiv').value, cx, py+ph+92*scale);
-  ctx.shadowBlur=0;
+  ctx.fillStyle="#000000";
+  ctx.font=`bold ${40*scale}px Arial`;
+  ctx.fillText(document.getElementById('name').value, cx, nameY);
+
+  ctx.fillStyle="#222222";
+  ctx.font=`600 ${28*scale}px Arial`;
+  ctx.fillText(document.getElementById('classDiv').value, cx, placeY);
 }
 
 function downloadImg(){
