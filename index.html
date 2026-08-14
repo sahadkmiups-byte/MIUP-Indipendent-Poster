@@ -2,14 +2,14 @@
 <html lang="ml">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MIUPS Kuttiady Centennium</title>
+<title>MIUPS Kuttiady</title>
 <style>
 body{font-family:Arial;background:#eef2f7;text-align:center;padding:12px;margin:0;}
 .box{background:#fff;max-width:430px;margin:auto;padding:16px;border-radius:16px;box-shadow:0 5px 20px rgba(0,0,0,.15);}
 input{width:95%;padding:12px;margin:6px 0;border-radius:8px;border:1px solid #ccc;}
 button{width:95%;padding:13px;border:none;border-radius:10px;font-weight:bold;margin-top:8px;}
 #btn1{background:#0d47a1;color:#fff;} #btn2{background:#138808;color:#fff;}
-canvas{width:100%;margin-top:12px;border-radius:12px;border:1px solid #ddd;}
+canvas{width:100%;height:auto;display:block;margin-top:12px;border-radius:12px;border:1px solid #ddd;}
 </style>
 </head>
 <body>
@@ -20,7 +20,7 @@ canvas{width:100%;margin-top:12px;border-radius:12px;border:1px solid #ddd;}
 <input type="text" id="classDiv" placeholder="Class & Div">
 <button id="btn1" onclick="draw()">Preview</button>
 <button id="btn2" onclick="downloadImg()">Download</button>
-<canvas id="c" width="1080" height="1800"></canvas>
+<canvas id="c" width="1080" height="1920"></canvas>
 </div>
 <script>
 const canvas=document.getElementById('c'), ctx=canvas.getContext('2d');
@@ -35,42 +35,49 @@ document.getElementById('name').addEventListener('input', draw);
 document.getElementById('classDiv').addEventListener('input', draw);
 
 function draw(){
-  ctx.drawImage(bg,0,0,1080,1800);
+  // Background - വലിവില്ലാതെ
+  ctx.drawImage(bg,0,0,1080,1920);
 
-  // === CORRECT WHITE BACKGROUND POSITION FOR THIS TEMPLATE ===
-  const px=698, py=590, pw=360, ph=485;
+  // Photo - വലിവില്ലാതെ Square-ന് അടുത്ത്
+  const px=700, py=650, pw=350, ph=440;
 
   if(userImg){
     ctx.save();
     ctx.beginPath();
-    const r=8;
+    const r=12;
     ctx.moveTo(px+r,py); ctx.lineTo(px+pw-r,py); ctx.quadraticCurveTo(px+pw,py,px+pw,py+r);
     ctx.lineTo(px+pw,py+ph-r); ctx.quadraticCurveTo(px+pw,py+ph,px+pw-r,py+ph);
     ctx.lineTo(px+r,py+ph); ctx.quadraticCurveTo(px,py+ph,px,py+ph-r);
     ctx.lineTo(px,py+r); ctx.quadraticCurveTo(px,py,px+r,py);
     ctx.closePath();
     ctx.clip();
+    // Cover Fit - Stretch ആവില്ല
     let s=Math.max(pw/userImg.width, ph/userImg.height);
     let w=userImg.width*s, h=userImg.height*s;
     ctx.drawImage(userImg, px+(pw-w)/2, py+(ph-h)/2, w, h);
     ctx.restore();
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(px+r,py); ctx.lineTo(px+pw-r,py); ctx.quadraticCurveTo(px+pw,py,px+pw,py+r);
+    ctx.lineTo(px+pw,py+ph-r); ctx.quadraticCurveTo(px+pw,py+ph,px+pw-r,py+ph);
+    ctx.lineTo(px+r,py+ph); ctx.quadraticCurveTo(px,py+ph,px,py+ph-r);
+    ctx.lineTo(px,py+r); ctx.quadraticCurveTo(px,py,px+r,py);
+    ctx.closePath();
+    ctx.strokeStyle="#ffffff"; ctx.lineWidth=4; ctx.stroke();
+    ctx.restore();
   }
 
-  // Text Position - ഈ Template-ന് അനുസരിച്ച് താഴ്ത്തി
-  const cx = px + pw/2;
+  const cx=px+pw/2;
   ctx.textAlign="center";
-  ctx.fillStyle="#000000";
-  ctx.font="bold 38px Arial";
-  ctx.fillText(document.getElementById('name').value, cx, py+ph+50);
-
-  ctx.fillStyle="#000000";
-  ctx.font="600 30px Arial";
-  ctx.fillText(document.getElementById('classDiv').value, cx, py+ph+88);
+  ctx.fillStyle="#000"; ctx.font="bold 36px Arial";
+  ctx.fillText(document.getElementById('name').value, cx, py+ph+48);
+  ctx.font="600 28px Arial";
+  ctx.fillText(document.getElementById('classDiv').value, cx, py+ph+85);
 }
-
 function downloadImg(){
   const a=document.createElement('a');
-  a.download=(document.getElementById('name').value || 'MIUPS')+'_Independence.png';
+  a.download=(document.getElementById('name').value || 'MIUPS')+'_Poster.png';
   a.href=canvas.toDataURL('image/png'); a.click();
 }
 </script>
